@@ -1,12 +1,12 @@
 # ~/.config/fish/conf.d/ssh-agent.fish
 
 if status is-interactive
-    # Define the local Linux socket path
     set -gx SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/ssh-agent.socket"
 
-    # Start the agent only if the socket isn't already active
-    if not ss -ax | grep -q "$SSH_AUTH_SOCK"
+    # Start agent only if unreachable; exit 1 means running but no keys yet
+    ssh-add -l >/dev/null 2>&1
+    if test $status -eq 2
         rm -f "$SSH_AUTH_SOCK"
-        eval (ssh-agent -c -a "$SSH_AUTH_SOCK") > /dev/null
+        ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
     end
 end
