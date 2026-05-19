@@ -37,3 +37,11 @@ if [ ! -S "$_SSH_SOCK" ]; then
 fi
 export SSH_AUTH_SOCK="$_SSH_SOCK"
 unset _SSH_SOCK
+
+# Load default key if the agent is empty. Runs silently in non-interactive
+# contexts (e.g. VSCode Server bootstrap) so devcontainers inherit a primed
+# agent without needing a terminal to be opened first. Requires a
+# passphrase-less key.
+if [ -f "$HOME/.ssh/id_ed25519" ] && ! ssh-add -l >/dev/null 2>&1; then
+    ssh-add "$HOME/.ssh/id_ed25519" >/dev/null 2>&1
+fi
