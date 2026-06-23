@@ -26,22 +26,29 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-# SSH agent — attach to the same socket Fish uses (conf.d/ssh-agent.fish),
-# so VSCode's bash processes (started via `bash --login`) share the agent
-# without re-prompting for a passphrase.
-# Falls back to /run/user/<uid> if XDG_RUNTIME_DIR is not set.
+# set PATH so it includes user's bun bin if it exists
+if [ -d "$HOME/.bun/bin" ] ; then
+    PATH="$HOME/.bun/bin:$PATH"
+fi
+
+# SSH agent — attach to the same socket Fish uses
 _SSH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 _SSH_SOCK="${_SSH_SOCK%/}/ssh-agent.socket"
-if [ ! -S "$_SSH_SOCK" ]; then
-    ssh-agent -a "$_SSH_SOCK" > /dev/null 2>&1
-fi
 export SSH_AUTH_SOCK="$_SSH_SOCK"
-unset _SSH_SOCK
 
-# Load default key if the agent is empty. Runs silently in non-interactive
-# contexts (e.g. VSCode Server bootstrap) so devcontainers inherit a primed
-# agent without needing a terminal to be opened first. Requires a
-# passphrase-less key.
-if [ -f "$HOME/.ssh/id_ed25519" ] && ! ssh-add -l >/dev/null 2>&1; then
+# Test the agent status (0=has keys, 1=empty, 2=unreachable/dead)
+ssh-add -l >/dev/null 2>&1
+_AGENT_STATUS=$?
+
+if [ $_AGENT_STATUS -eq 2 ]; then
+    rm -f "$SSH_AUTH_SOCK"
+    ssh-agent -a "$SSH_AUTH_SOCK" > /dev/null 2>&1
+    _AGENT_STATUS=1
+fi
+
+# Load default key if the agent is active but empty
+if [ $_AGENT_STATUS -eq 1 ] && [ -f "$HOME/.ssh/id_ed25519" ]; then
     ssh-add "$HOME/.ssh/id_ed25519" >/dev/null 2>&1
 fi
+
+unset _SSH_SOCK _AGENT_STATUS
