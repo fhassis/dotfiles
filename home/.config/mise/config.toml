@@ -2,6 +2,9 @@
 # Development toolchains (node, uv, kubectl, ...) come from the devcontainer
 # image's /etc/mise/config.toml, merged with this one.
 [tools]
+# fish's static release build; install.sh links it at ~/.local/bin/fish
+"github:fish-shell/fish-shell" = "latest"
+tmux = "latest"
 bat = "latest"
 delta = "latest"
 eza = "latest"

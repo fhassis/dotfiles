@@ -14,12 +14,20 @@ git clone https://github.com/fhassis/dotfiles ~/dotfiles
 ~/dotfiles/install.sh
 ```
 
-Then set your terminal's profile to run `fish` (Windows Terminal: `wsl.exe -d <distro> fish`;
-Ghostty: `command = fish`). The script doesn't `chsh`: bash stays the login
-shell, so scripts that expect it keep working. You also need a
-[Nerd Font](https://www.nerdfonts.com) in the terminal.
+Only `git` and `curl` are needed: everything else, fish included, installs in
+the home, without root.
 
-**Devcontainers (VS Code):** in your *user* settings:
+Then point your terminal's profile at `~/.local/bin/fish`, with the full path:
+
+- Windows Terminal: `wsl.exe -d <distro> --cd ~ -e /home/<you>/.local/bin/fish`
+- Ghostty: `command = /home/<you>/.local/bin/fish`
+
+The script doesn't `chsh`: bash stays the login shell, so scripts that expect it
+keep working. You also need a [Nerd Font](https://www.nerdfonts.com) in the terminal.
+
+**Devcontainers (VS Code):** the [devcontainer template](https://github.com/fhassis/devcontainer)'s
+`devcontainer.json` already sets these in `customizations.vscode.settings`; they
+also work in your VS Code *user* settings:
 
 ```jsonc
 "dotfiles.repository": "fhassis/dotfiles",
@@ -32,17 +40,17 @@ Run `install.sh` again after a pull. It is idempotent.
 
 ## What `install.sh` does
 
-1. **Workstation only:** `apt install` fish and tmux if they are missing (asks for sudo).
-2. **Links** every file under [`home/`](./home) to the same path in `$HOME`, one by one,
+1. **Links** every file under [`home/`](./home) to the same path in `$HOME`, one by one,
    never whole directories, so files the tools write (`fish_variables`...) stay out
    of the repo. An existing regular file is kept as `<file>.bak`. Links into this
    repo that no longer resolve (a file removed here, or an older stow layout) are removed.
-3. **Tools:** installs [mise](https://mise.jdx.dev) if missing (the devcontainer
+2. **Tools:** installs [mise](https://mise.jdx.dev) if missing (the devcontainer
    image already has it), then `mise install` for the tools in
    [`~/.config/mise/config.toml`](./home/.config/mise/config.toml), all latest,
-   in the home, no root. Then builds bat's theme cache.
-4. **Catppuccin for tmux and neovim:** clones them at a pinned tag (no plugin managers).
-5. **WSL only:** installs [wsl2-ssh-agent](https://github.com/mame/wsl2-ssh-agent).
+   in the home, no root: fish and tmux (static builds) and the rest. Then builds
+   bat's theme cache and links fish at `~/.local/bin/fish`.
+3. **Catppuccin for tmux and neovim:** clones them at a pinned tag (no plugin managers).
+4. **WSL only:** installs [wsl2-ssh-agent](https://github.com/mame/wsl2-ssh-agent).
 
 ## What you get
 

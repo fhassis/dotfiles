@@ -2,9 +2,9 @@
 # Terminal setup: links home/ into $HOME and installs the tools with mise.
 #
 # Idempotent: run it again after a pull. VS Code's dotfiles feature runs it in
-# every new devcontainer. On a workstation (Debian/Ubuntu, native or WSL) it
-# also apt-installs fish and tmux; it never changes the login shell (set fish
-# as the terminal's profile command instead).
+# every new devcontainer. Needs only git and curl: everything, fish included,
+# installs in the home without root. It never changes the login shell: point the
+# terminal's profile at ~/.local/bin/fish instead.
 set -eu
 
 DOT=$(cd "$(dirname "$0")" && pwd)
@@ -21,20 +21,6 @@ else
     ENV=native
 fi
 say "environment: $ENV"
-
-# ---- system packages (workstation only: the devcontainer image ships them, and has no sudo)
-if [ "$ENV" != container ]; then
-    missing=
-    for pkg in fish tmux; do
-        command -v "$pkg" >/dev/null 2>&1 || missing="$missing $pkg"
-    done
-    if [ -n "$missing" ]; then
-        say "apt install:$missing"
-        sudo apt-get update -qq
-        # shellcheck disable=SC2086
-        sudo apt-get install -y $missing
-    fi
-fi
 
 # ---- drop links into this repo left by an older layout (e.g. stow's
 #      ~/.config/fish -> repo) or pointing to files since removed from home/
@@ -70,6 +56,8 @@ fi
 say "installing tools"
 mise install
 mise exec -- bat cache --build >/dev/null
+# a fixed path for terminal profiles (Windows Terminal, Ghostty, VS Code)
+ln -sfn "$(mise which fish)" "$BIN/fish"
 
 # ---- Catppuccin plugins for tmux and neovim, pinned (no plugin managers)
 clone() { # <github repo> <tag> <dir>
