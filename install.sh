@@ -70,7 +70,11 @@ clone() { # <github repo> <tag> <dir>
 clone catppuccin/tmux v2.3.2 "$HOME/.config/tmux/plugins/catppuccin/tmux"
 clone catppuccin/nvim v2.0.0 "$HOME/.local/share/nvim/site/pack/themes/start/catppuccin"
 
-# ---- WSL: bridge to the Windows ssh-agent (see conf.d/50-ssh-agent.fish)
+# ---- WSL: bridge to the Windows ssh-agent (see conf.d/50-ssh-agent.fish); its
+#      socket goes in ~/.ssh, which a fresh distro doesn't have
+if [ "$ENV" = wsl ]; then
+    mkdir -p -m 700 "$HOME/.ssh"
+fi
 if [ "$ENV" = wsl ] && [ ! -x "$BIN/wsl2-ssh-agent" ]; then
     say "installing wsl2-ssh-agent"
     curl -fsSL -o "$BIN/wsl2-ssh-agent" \
