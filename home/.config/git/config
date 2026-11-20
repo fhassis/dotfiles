@@ -1,0 +1,20 @@
+# Shared git settings. Identity stays in ~/.gitconfig (per machine; VS Code
+# copies it into devcontainers), which git reads after this file.
+[include]
+	path = catppuccin.gitconfig
+
+# delta for diffs, falling back when it isn't on PATH (bash on a workstation
+# doesn't activate mise).
+[core]
+	pager = command -v delta >/dev/null 2>&1 && exec delta || exec less -FRX
+[interactive]
+	diffFilter = command -v delta >/dev/null 2>&1 && exec delta --color-only || exec cat
+[delta]
+	features = catppuccin-mocha
+	navigate = true
+	line-numbers = true
+
+[diff]
+	colorMoved = default
+[merge]
+	conflictStyle = zdiff3

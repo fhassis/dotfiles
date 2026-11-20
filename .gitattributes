@@ -1,0 +1,2 @@
+# Linux files: keep LF even on a Windows checkout.
+* text=auto eol=lf

@@ -1,0 +1,13 @@
+# Terminal tools, the same everywhere (workstation and devcontainer).
+# Development toolchains (node, uv, kubectl, ...) come from the devcontainer
+# image's /etc/mise/config.toml, merged with this one.
+[tools]
+bat = "latest"
+delta = "latest"
+eza = "latest"
+fd = "latest"
+fzf = "latest"
+neovim = "latest"
+ripgrep = "latest"
+starship = "latest"
+zoxide = "latest"

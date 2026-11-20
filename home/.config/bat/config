@@ -1,0 +1,2 @@
+# The theme file is in themes/; install.sh runs `bat cache --build`.
+--theme="Catppuccin Mocha"
